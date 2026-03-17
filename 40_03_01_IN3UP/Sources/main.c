@@ -1,0 +1,350 @@
+/* ###################################################################
+**     Filename    : main.c
+**     Project     : 17_IN1UP
+**     Processor   : MCF52233CAF60
+**     Version     : Driver 01.00
+**     Compiler    : CodeWarrior MCF C Compiler
+**     Date/Time   : 2015-07-13, 17:20, # CodeGen: 0
+**     Abstract    :
+**         Main module.
+**         This module contains user's application code.
+**     Settings    :
+**     Contents    :
+**         No public methods
+**
+** ###################################################################*/
+/*!
+** @file main.c
+** @version 01.00
+** @brief
+**         Main module.
+**         This module contains user's application code.
+*/         
+/*!
+**  @addtogroup main_module main module documentation
+**  @{
+**  
+**  PROGRAMA PARA LA TARJETA INSIGHT PROCESADORA VERSION-2
+**  
+**  version 34.-
+**  version 35.- se intercambio el uart 1 y 0 porque el hardware estan intercambiados
+**  
+**  
+/* 25-OCT-19
+ *   Xtal: 25 Mhz, 
+ *   MCF52233CAF60
+ *   External clock: 60Mhz
+ *   Bus  clock Frecuq: 30Mhz
+ *   System Clock Frecq: xtal*12/1
+ *   PLL: enabled
+ *   loss of lock reset: disable, disable
+ *   PLL multiplier: 12
+ *   PLL divider: 1
+ *   RTC  divider: 1hz
+ *   Unhandler vectors: Own handle for every
+ *   Cpu_D
+ *   
+ *  Busy:Exint,
+ *     IRQ11_PGP3, falling edge, 
+ *     level 7 priority 7,
+ *  TI1:TimerInt
+ *     GPATA_channel1
+ *     leve1,priority1
+ *     interrupt period:500us
+ *     same period in mode: yes
+ *     use entire timer: no
+ *     init: no
+ *     event enable in init:no
+ *     high speed: enable only
+ *  SM1:SynchroMaster
+ *  
+ *      SM1
+ *      QSPI
+ *      LEVEL 6,7
+ *      LEVEL 6,7
+ *      input buffer:0
+ *      output buffer:0
+ *      width:16bits
+ *      clock edge: falling edge
+ *      shift  clock rate: 0.1useg
+ *      wait delay: 0.425useg
+ *      empty char:0
+ *      ignore::no
+ *      send MSB first:yes
+ *      shift clock idle polarity: High
+ *      enble in init: yes
+ *      events enabled in init: yes  sin
+ *      METHODS: ALL OFF
+ *      events:
+ *    
+ *     channel: QSPI
+ *     int:Enabled
+ *     level 6 priority 7
+ *     level 3 priority 7
+ *     
+ *     width: 16 bits
+ *     input pin: QSPI DIN CANRX URXD1 PQS1
+ *     output pin: QSPI DOUT CANTX
+ *     clock pin: QSPI CLK SCL
+ *     slave disable
+ *     clock edge: falling edge
+ *     shift clock rate: 0.1useg
+ *     wait delay: 0.425us
+ *     empty char: 0
+ *     ignore empty char no
+ *     Send MSB FIRST:  yes
+ *     shift clock idle polarity:  High
+ *     enable in init: yes
+ *     events enable in init: yes
+ *     high speed: enable
+ * CS0:BITio
+ *     PIN: SPDLED_PLD2
+ *     Dir: out
+ *     init value: 1
+ *     Optimizacion: speed
+ * CS1: bITIO
+ *    pin:SYNCA CANTX FEC MDIO
+ *    Direction: output
+ *    init value: 1
+ *    optimization:speed
+ * RC:bitIO
+ *    pin:DTIN0 DTOUT0 PWM0 PTC0
+ *    dir: output
+ *    init value:1
+ *    optimization: speed
+ * QSPI_CS0:BitIO
+ *    pin:QSPI CS0 SDA UCT1
+ *    dir:output
+ *    init:0
+ *    optimization:speed
+ * LED_BOOT:BitIO
+ *    pin:DUPLE PLD3
+ *    dir:output
+ *    init:0
+ *    optimization:SPEED
+ * LED2:BitIO
+ *    pin:AN0 PAN0
+ *    dir:output
+ *    init:0
+ *    optimization: speed
+ * LED3:BitIO
+ *    pin:AN1 PAN1
+ *    dir:output
+ *    init:0
+ *    optimizacion: speed
+ * VFDserial:AsynchroSerial
+ *    channel:UART1
+ *    level2, priority 2
+ *    level1, priority 2
+ *    level1, priority 3
+ *    input buffer: 200
+ *    output buffer: 900
+ *    CTS: disable
+ *    RTS: disable
+ *    parity:8
+ *    width:1
+ *    stop bit: Normal
+ *    channel mode:Normal
+ *    Receiver: URXD1 FEC TXD0
+ *    Transmitter: UTXD1 FEC COL PUB0
+ *    Baud rate: 9200
+ *    Break: disable
+ *    enable init code: yes
+ *    enable event in init: yes
+ *    high speed: enable
+ *    
+*/       
+/* MODULE main */
+
+
+/* Including needed modules to compile this module/procedure */
+#include "Cpu.h"
+#include "Events.h"
+#include "VFDserial.h"
+#include "LED2.h"
+#include "LED3.h"
+#include "LED4_SYS_MON.h"
+#include "SDATA.h"
+#include "FSYNC.h"
+#include "TI1.h"
+#include "DB0.h"
+#include "DB3.h"
+#include "LED_BOOT.h"
+#include "LED12_SYS.h"
+#include "LED_BOOT.h"
+#include "LEDERRCOMM.h"
+#include "LED56_COMM_WARN_MON.h"
+#include "LED56_COMM_WARN_MON.h"
+#include "LED3_Process.h"
+#include "TACHO.h"
+#include "CLK_AN_COUNT.h"
+#include "CNTR_G_AMP1.h"
+#include "CNTR_G_AMP2.h"
+#include "CNTR_G_AMP3.h"
+#include "PIN_DRIVE_OUT.h"
+#include "SM1.h"
+#include "FREC_SEL0_PIN.h"
+#include "FREC_SEL1_PIN.h"
+#include "ADC_BAL.h"
+#include "Busy.h"
+#include "EInt1.h"
+#include "FC322.h"
+#include "FC1.h"
+
+#include "CS0.h"
+#include "I2C.h"
+#include "RTC1.h"
+#include "CS1.h"
+#include "CTS_UART0.h"
+#include "DB0.h"
+#include "RC.h"
+#include "LED3.h"
+#include "WP.h"
+#include "IOUPserial.h"
+#include "CTS_UART0.h"
+#include "RTS_UART0.h"
+#include "LED12_SYS.h"
+#include "FSYNC.h"
+#include "TI2.h"
+/* Including shared modules, which are used for whole project */
+#include "PE_Types.h"
+#include "PE_Error.h"
+#include "PE_Const.h"
+#include "IO_Map.h"
+#include "VFD.h"
+#include "VFDmenu.h"
+#include "errorController.h"
+#include "Memoria.h"	
+#include "frecqController.h"
+//#include "LCD.h"
+#include "I2C_.h"							
+#include "ADC.h"
+#include "BIOS.h"
+#include "DSP.h"
+#include "IOcomms.h"
+#include "delay.h"
+#include "AnalogCntrl.h"
+#include "SistemaOperativo.h"
+#include "seguridad.h"
+#include "queue.h"
+	
+#include "TFTmenu.h"   
+#include "system.h"           
+#include "LED3_Process.h"
+#include "keypad.h"       
+
+//extern struct _Error32_Comando_DDS3_ sysMrrreeeeerrrddon; 
+//extern struct  dds;
+//extern  struct _SysMon sysmon,sysmon2;
+extern unsigned long int delaydebug;
+
+	
+/* User includes (#include belo this line is not maintained by Processor Expert) */  
+ void main(void){  //MCF52233CAF60    256Kbytes/RAM=32kbytes.
+//unsigned char *p;//pointer para OS.	
+  /* Write your local variable definition here */
+  /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
+    PE_low_level_init(); 
+  /*** End of Processor Expert in-e	rnal initialization.                   ***/
+  /* Write your code here */
+  /* For example: for(;;) {} */
+    //init_BIOS()
+    
+    setReg16(PMR0, 0x0000);
+    setReg16(PMR1, 0x0000);
+    setReg16(PCSR0,0x000D);
+    setReg16(PCSR1,0x000D);	
+    
+        
+   
+    controlador_LED12(INIT); //21    2527
+    disable_ErrorControls(); //19    11730  =2   53805 
+    TI1_DisableEvent();      //10     778   =9   10952
+    Busy_Disable();          //16    21717
+    disableIO_reciv();       //7     8732
+    TACHO_Disable();         //3     12696
+    CLK_AN_COUNT_Disable();  //25    1560
+    init_I2C();              //22    27129
+   // init_Menu();             
+    init_ErrorController();  //25    18834
+    init_MemoVars();         //4     438
+    init_Products();         //6     2924
+    init_Control_deFrecuencias();//5  879
+    init_DSP();              //
+//    init_VFD();              s
+//    run_Menu();				 
+    init_IOcomms();			 //sysmon.i=14; 715useg
+    enable_ErrorControls();  //sysmon.i=15;
+    enable_Comms_TX();       //sysmon.i=16; 55useg
+    enableIO_reciv();		 //sysmon.i=17;
+    init_Semaforos();	     //sysmon.i=18; 55useg
+    init_Analoga();			 //sysmon.i=19; 220seg
+    init_queues();			 //sysmon.i=20; 159170useg=159.170mseg
+    init_IOUP_comms();			 //sysmon.i=21; 55useg  
+    controlador_LED12(WAIT); //sysmon.i=22; 110useg
+    controlador_LED3_Detect(ON);//sysmon.i=23; 55useg
+    setPassword_Debug();     //sysmon.i=24; 6.765mseg //simula que estan grabadas las passwords en LA eeprom
+    init_ADC();				 //sysmon.i=26;   660useg
+    test_FIFOS_VFD(); 					
+    vfd_FIFOs_RESET();		 //sysmon.i=25; 216.7mseg
+    
+    delay_ms(1000);// que encienda VFD Y luego mandamos init_VFD
+  for(;;){	  
+            xComunicacion_serial_al_IOUP_tarjeta();
+            // comunicacion_IIC_con_Memoria_EEPROM();
+	        // comunicacion_IIC_con_NVRAM();
+			xDriver_de_Transmision_al_VFD();//3-pointers
+            xControl_Principal_de_Menus_Operativo();//Control_Operativo_de_Escape_de_Menus();//Cambio de Menu    
+            Signal_Processor_Controller();//Procesador Central de las Señales analogas digitalizadas		
+            Monitor_Maestro_de_ERRORES();//Monitor Maestro del SYSTEMA 
+            Controlador_Driver_de_Keypad_Operativo();  
+            Pruebas_Y_Debugeo_Testeo_del_Systema(); 
+
+
+
+//	  sysmon.i=1; Controlador_Driver_Procesador_de_Señales_DDS_Operativo();//75useg  se tiene que inizializar el dsp //despliega los puntitos en pantalla DDS
+//	  sysmon.i=2; DDS_repaint_Zoom();//40useg  aqui	
+////	    Display_DDS_TRANSMISSOR_CONTROLLER();//transmite los datos al menu DDS
+//  /*sysmon.i=3;*/ IOUP_BOARD_SERIAL_CONTROLLER();//7.285mseg   CONTROLADOR PRINCIPAL DE transmision a la tarjeta io	    LED12_SYS_NegVal();
+//	    //LED12_SYS_ClrVal();
+
+//	  sysmon.i=7; MonitorCentralEntradas();//monitorea las ntradas y decide 
+//	  sysmon.i=8; displayPruebasEntradas();  
+//	  sysmon.i=11;menuTemporizadorOperativo();//monitor de menus,
+
+////	    ControlaorOperativoComunicacionI2C();//controlador de comunicaciones I2C hacia memorias,driver de vibracion,y generador de frecuencia
+//	  sysmon.i=13;displayTimer_IRQ();
+//	  sysmon.i=14;IN3UP_test();dd
+//	  sysmon.i=15;DebugSimulationKeyboard();//teclado virtual remoto  
+//	  sysmon.i=16;Monitor_Maestro_de_Voltajes();//monitorea los voltajes de la analoga.
+//	    //valida7ePassword1();
+//	  sysmon.i=17;Controlador_Principal_Central_Communicacion_IIC();
+//	    //Controlador_de_Teclado_Keypad(); 
+//	  sysmon.i=18;Testing_SO_Debug();    
+//	  sysmon.i=20;Controlador_Driver_de_EEPROM(); 
+//	  sysmon.i=21;Monitor_Reloj_Analogo();
+//	  sysmon.t[27]=0; //sysmon.i=26;
+//	  sysmon.reset();
+//	   LED12_SYS_NegVal();
+
+      }// fin codigo de pruebas
+  	  
+  
+  /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
+  /*** Processor Expert end of main routine. DON'T MODIFY THIS CODE!!! ***/
+  for(;;){}
+  /*** Processor Expert end of main routine. DON'T WRITE CODE BELOW!!! ***/
+} /*** End of main routine. DO NOT MODIFY THIS TEXT!!! ***/
+
+/* END main */
+/*!
+** @}
+*/
+/*
+** ###################################################################
+**
+**     This file was created by Processor Expert 10.3 [05.09]
+**     for the Freescale MCF series of microcontrollers.
+**
+** ###################################################################
+*/
