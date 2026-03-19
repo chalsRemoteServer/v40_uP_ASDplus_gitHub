@@ -80,7 +80,7 @@
 #define Mask_CMD        0xFE  //1111 1110 mascara de comando para quitar el  rechazo
 #define CMD_GOTIS_XY    0x82   //1000 001R: R:bit de rechazo
 #define CMD_IN3UP_GOTIS 0x13 //COMANDO PARA ver ell DDS E  EEL touch sreen
-#define CMD_DDS 0x13
+//#define CMD_DDS 0x13
 
 #define CMD_RELE_FALLA_ON      0x14//03 03 14 13 02
 #define CMD_RELE_FALLA_OFF     0x15//03 03 15 E4 02
@@ -297,5 +297,5 @@ void IOUPserial_Recepcion_Procesamiento(unsigned char c);
 void Gotis_Portal_Inicio(unsigned char c);
 void Master_Monitor(unsigned char c);
 void Gotis_Send_DDS(unsigned char c);
-void xComunicacion_serial_al_IOUP_tarjeta(void);
+void Transmision_Consola(void);
 void xEmpaquetado_de_datos_Deteccion_Hacia_IOUP(void);

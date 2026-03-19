@@ -311,4 +311,6 @@
 #define PID16 0x10//digitoRtLeft
 #define PID17 0x11//VFDdrawLine_v4
 
+#define CMD_DDS 0xF1 //comando de transmision datos de deteccion raw X&Y
+
 

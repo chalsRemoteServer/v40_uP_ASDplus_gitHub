@@ -54,6 +54,7 @@
 #define SIZE_BUFFER14 20//20=No modif streaming-block size transmision a la IOUP  
 #define SIZE_BUFFER15 20 //20 no modificar FIFO guarda deteccion, para transmitirla por serial IOUP
 #define SIZE_BUFFER16 5  //buffer de recursos de vfd de gestion de
+#define SIZE_BUFFER21 30//FIFO DE transmision serial a display tft
 #define SIZE_BOXES    20
 #define SIZE_SYS_MONITOR 30
 #define SIZE_TBC 15
@@ -285,6 +286,13 @@ struct _FIFO_func2_{
 };//fin _FIFO_func_----------------------------------------
 
 
+struct _FIFO_func3_{
+	  unsigned char (*append)(unsigned char x);
+	  unsigned char (*pop)(unsigned char *x);
+	  unsigned char (*resetFIFOS)(void);//resetear todas las FIFOs Y arrays y registros
+};//fin _FIFO_func_----------------------------------------
+
+
 struct _Recursos{
 	 //struct _FIFO_func_  f;//funciones de la fifo de VFDprocesos
 	 struct _FIFO_1byte_ VFDprocesos;//procesos que quieren el recurso
@@ -338,11 +346,14 @@ struct COMUNICACIONES_{//-----------------------------------------------
 
 
 
-struct _DISPLAY_VFD_{
+struct _DISPLAY_VFD_{	
+	struct _FIFO_1byte_ TxDisp;//fifo serial a display
 	struct _FIFO_1byte_ x;//parametro 1
 	struct _FIFO_1byte_ y;//parametro 2
 	struct _FIFO_1byte_ p;//parametro 3
 	struct _FIFO_func_  f1;//funciones para guardar lo que se grafica
+	struct _FIFO_func3_  fifo;//funciones para guardar lo que se grafica
+		
 	struct _box_control{
 		 unsigned char boxs[SIZE_BOXES];
 		 unsigned char box0;

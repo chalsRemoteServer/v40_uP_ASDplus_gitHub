@@ -693,7 +693,7 @@ Undefined : "contextoActual" Referenced from "AnguloVibracionProcesadorCentral" 
 #define SIZE_BUFF  20//Tamaño de los Buffers
 #define SIZE_MEMO_APP 40 //tamaño de la memoria para los hilos en ejecucion
 
-
+#define SIZE_TX_SER 30 //FIFO serial
 
 
 struct _Contexto{
@@ -744,6 +744,8 @@ struct _Returns{
 	       }bit;
 		}u;
 };
+
+
 
 
 struct _Menu_{

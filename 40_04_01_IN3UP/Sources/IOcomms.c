@@ -1013,7 +1013,7 @@ const unsigned char _RESET_=0x80U;
 
 /*  CONTROLADOR PRINCIPAL DE LA COMUNICACION CENTRAL MAESTRA
  *  DE LA TRANSMISION DE DATOS HACIA LA TARJETA IOUP **/
-void xComunicacion_serial_al_IOUP_tarjeta(void){
+void Transmision_Consola(void){
 	 xComunicaciones_Transmisor_a_IOUP_BOARD();
      xEmpaquetado_de_datos_Deteccion_Hacia_IOUP();
 }//fin de la comunicacion serial al la tarjeta IOUP board--------------

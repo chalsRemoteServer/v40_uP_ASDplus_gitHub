@@ -287,13 +287,13 @@ extern unsigned long int delaydebug;
     init_ADC();				 //sysmon.i=26;   660useg
     test_FIFOS_VFD(); 					
     vfd_FIFOs_RESET();		 //sysmon.i=25; 216.7mseg
-    
     delay_ms(1000);// que encienda VFD Y luego mandamos init_VFD
   for(;;){	  
-            xComunicacion_serial_al_IOUP_tarjeta();
+            Transmision_Consola();
             // comunicacion_IIC_con_Memoria_EEPROM();
 	        // comunicacion_IIC_con_NVRAM();
-			xDriver_de_Transmision_al_VFD();//3-pointers
+			//Transmision_al_Display_TFT1();//3-pointers
+			Transmision_al_Display_TFT();
             xControl_Principal_de_Menus_Operativo();//Control_Operativo_de_Escape_de_Menus();//Cambio de Menu    
             Signal_Processor_Controller();//Procesador Central de las Señales analogas digitalizadas		
             Monitor_Maestro_de_ERRORES();//Monitor Maestro del SYSTEMA 

@@ -721,197 +721,51 @@ static unsigned char i;
          }}
 }//DDS_repaint_Zoom----------------------------------------------------
 
-/* Despliega los chars, puntos, cajas, rayas y todo en el display
- *  de manera sistematica operativa con FIFOs
- *  SE USAN DOS POINTERS=xxx             
- *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  */
-unsigned char xDriver_de_Transmision_al_VFD(void){
-static unsigned char estado,estado1,estado22,estadowait;      //POINTER=5
-static unsigned char *x,*y,*p,*box1,*box0;
-static unsigned short int x1,y1,x2,y2;
-static unsigned char pen,mode,ibox0,*pp;	
-coordn16 coordenadas;
-static short int cleanerBox;
-static unsigned char clearBox;
-auto unsigned char *inst;//memoria para procesos hijos
-static float f[50];//20:xDisplay_Sens_DDS_VFD
-static unsigned short int usi[6];//1:xDisplay_Parametros_PORTAL_INICIO_VFD, 6:xDisplay_Sens_DDS_VFD
-static unsigned char inst2[3];//2:
 
-static unsigned char inst3[55];//41+8ucar:xDisplay_Sens_DDS_VFD
-static unsigned long int ulint;
-const unsigned char PUNTOX=50,POSX=40,DELAYUSX=90,DELAYMSX=110;
-const unsigned char CHARX=3;
-static struct Coorduc Pc;//1:xDisplay_Punto_DDS_VFD
-static double instD[8];//7:xDisplay_Punto_DDS_VFD
-static struct Coordusi Pu;//1:xDisplay_Punto_DDS_VFD
-static unsigned long long int delay2;//delay del sistema de este metodo
-static union W7{//access word: 
-	unsigned  short int wordx;   //   	0xaabb        //         aa
-	unsigned char byte[2];        //byte[0]=aa,byte[1]=bb
-}w16;
-//auto unsigned short int usint; 
-static unsigned char estadoDelay;
-inst=&menu.v.aux[0];
-  
-switch(estado22){
-   case 1:if(xInit_VFD(inst))estado22++; break;
-   case 2:if(xInit_Menu(inst))estado22++;break;
-   case 3:/*if(menu.b.b.isMenu)*/estado22++; break;
-   case 4:if(xDisplay_Parametros_PORTAL_INICIO_VFD(inst,&usi[0],&ulint))estado22++;break;
-   case 5:if(xDisplay_Cursores_DDS_VFD(inst))estado22++;break;
-   case 6:if(xDisplay_Punto_DDS_VFD(&Pc,&Pu,&inst2[0],&instD[0]))estado22++;break;
-   case 7:if(xDisplay_Sens_DDS_VFD(&inst3[0],&usi[0],&f[0]))estado22++;break;
-   default:estado22=1;break;}
- 
- /*DRIVER MAESTRO PRINCIPAL CENTRAL UNICO DE DESPLIEGUE DEL VFD*/
-      box1=&vfd.box.box;box0=&vfd.box.box0;
-      x=&vfd.v.dat[13];y=&vfd.v.dat[12];p=&vfd.v.dat[11];
-      switch(estado1){//DRIVER DE VIDEO
-    	  case 0:if(vfd.f1.pop(x,y,p)){ //No esta vacio
-    		           vfd.bits.b.FIFOonReset=0;//trabajo normal si n cambio de contexto
-                       menu.b.b.isBusy=1;//estamos graficando
-    		           estado1++;
-    		           vfd.v.timer=DELAY_TIME;
-    		           vfd.v.index=0;}
-    	         break;
-    	  case 1:switch(*p){
-					  case 	_BOX_:if(vfd.bits.b.BOX_enable){
-						              *box1=*x;estado1++;}
-					  	  	  	  else{estado1=55;}
-					              break;
-					  case _CHAR_:estado1=CHARX;break;
-					  case _PUNTO_:estado1=PUNTOX; break;
-					  case _RAYA_:break;
-					  case _BOLD_:estado1=54;break;//debug
-					  case _POS_:estado1=POSX;break;
-					  case _DDS_BORRAR:estado1=POSX;break;
-					  case _DDS_reZOOM:estado1=POSX;break;
-					  case _DELAY_:estado1=DELAYUSX;
-					  case _DELAY_US:estado1=DELAYUSX;break;
-					  case _DELAY_MS:estado1=DELAYMSX;break;
-						             break;
-//					  case _FEM_:estado=6;break; //flag end Menu					 
-					  default:estado1=55;break;}		
-    	         break;
-    	  case 2:if(*box0>MAX_BOXES)
-    		        *box0=0;
-    	         if(*box0==*box1){
-    	                estado1=0;
-    	                vfd.v.timer=BUSY_K;
-    	                break;}
-    	         else{
-				   if(*box0>*box1){//borrando cuadros
-					   pen=0;ibox0=*box0;
-					   getBoxPattern(ibox0,&mode,&x1,&y1,&x2,&y2);//box0 se tiene que decrementar despues no antes
-					   if(*box0>0)
-						    ibox0--;
-				            *box0=ibox0;}
-    	           else
-    	        	  if(*box1>*box0){
-						 pen=1;	 ibox0=*box0;
-						 ibox0++;//incrementamos el valor box0, para alcanzar box1
-						 getBoxPattern(ibox0,&mode,&x1,&y1,&x2,&y2);
-						 *box0=ibox0;}}
-    	         
-    	         vfd.v.dat[0]=0x1F;
-    	         vfd.v.dat[1]=0x28;vfd.v.dat[2]=0x64;vfd.v.dat[3]=0x11;
-    	         vfd.v.dat[4]=mode;
-    	         vfd.v.dat[5]=pen;		
-    	         coordenadas.coord16=x1;		
-    	         vfd.v.dat[6]=coordenadas.byte[LO];		
-    	         vfd.v.dat[7]=coordenadas.byte[HI];		
-				 coordenadas.coord16=y1;		
-				 vfd.v.dat[8]=coordenadas.byte[LO];		
-				 vfd.v.dat[9]=coordenadas.byte[HI];
-				 coordenadas.coord16=x2;		
-				 vfd.v.dat[10]=coordenadas.byte[LO];		
-				 vfd.v.dat[11]=coordenadas.byte[HI];		
-				 coordenadas.coord16=y2;		
-				 vfd.v.dat[12]=coordenadas.byte[LO];		
-				 vfd.v.dat[13]=coordenadas.byte[HI];
-				 vfd.v.nbytes=14;//bytes a emitir
-				 estado1=33;//emitir los datos; FIN DE CAJAS
-				 break;//fin case 2------------------------------------
-    	  case CHARX:
-    	         vfd.v.dat[0]=*x; //x=vfd.v.dat[13];y=vfd.v.dat[12];p=vfd.v.dat[11];			 
-			     vfd.v.nbytes=1;//bytes a emitir 	EMITIR CHAR
-                 estado1=33;
-                 break;//fin de char
-    	  case POSX:
-    		     vfd.v.dat[0]=0x1F;//INICIA COMANDO DE POSICION
-				 vfd.v.dat[1]=0x24;
-				 vfd.v.dat[2]=vfd.v.dat[13];//variable x
-				 vfd.v.dat[3]=0x00;
-				 vfd.v.dat[4]=vfd.v.dat[12];//variable y
-				 vfd.v.dat[5]=0x00;		
-				 vfd.v.nbytes=6;//bytes a emitir
-				 estado1=33;
-				 break;//fin de posicion
-    	  case PUNTOX:if(menu.b.b.MenuPendiente){ estado1=0;break;}
-    	         vfd.v.dat[0]=0x1F;
-    	         vfd.v.dat[1]=0x28;
-    	         vfd.v.dat[2]=0x64;
-    	         vfd.v.dat[3]=0x10;
-    	         vfd.v.dat[4]=0x01;//pen=1;
-    	         vfd.v.dat[5]=*x;
-    	         vfd.v.dat[6]=0x00;
-    	         vfd.v.dat[7]=*y;
-    	         vfd.v.dat[8]=0x00;
-				 vfd.v.nbytes=9;//bytes a emitir
-				 estado1=33;    
-				 break;//Fin de Punto de DDS	---++++++++++++++++++++++++++++++++++			 
-    	  case 7:if(vfd.v.timer==0)
-    		        if(vfd.bits.b.TxBuffOFF)
-    	    		         estado1=8;
-    	    	         break;
-     	  case 8: switch(menu.contexto.Actual){
-    	    		  case PANTALLA_DDS:vfd.bits.b.DDSon=1;break; 
-    	    		  default:break;}
-    	    	  estado1=54;
-    	    	  break;
-    	  case DELAYUSX:w16.byte[0]=*x;w16.byte[1]=*y;
-    	  	            estado1++;break;
-    	  case DELAYUSX+1:if(delay_us_VFD_exclusivo(w16.wordx))
-    	  		               estado1++;
-    	   	  	  	  	  break;
-		  case DELAYUSX+2:estado1=55;break;
-    	  case DELAYMSX:w16.byte[0]=*x;
-		         	 	w16.byte[1]=*y;
-		         	 	estado1++;
-    	                break;
-    	  case DELAYMSX+1:if(delay_general_1ms(&delay2,(unsigned long long int)w16.wordx,&estadoDelay))
-	                               estado1++;
-    	  		       	  break;
-		  case DELAYMSX+2:estado1=55;break;
-    	  case 33:if(vfd.v.nbytes==vfd.v.index)
-    		            estado1=54;
-				  else  estado1=34;      
-    	          break;
-    	  case 34:if(delay_general_1ms(&delay2,2,&estadoDelay))//OK:100,50,25,12,6,3,1  |||
-    		             estado1++;
-    	          break;
-    	  case 35:VFDserial_SendChar(vfd.v.dat[vfd.v.index]);
-     		      vfd.v.dat[vfd.v.index++]=0; 
-                  estado1=33;
-    		      break;//fin de enviar el Buffer
-    	  case 54://esperamos que lleguen los ultimos datos al display
-    		      if(vfd.bits.b.TxBuffOFF){  
-    		    	  menu.b.b.isBusy=0;//Deteccion.BarraDeteccionStatus=BUSY_WAIT;//terminamos de graficar algo.      
-    		    	  cleanArray(&vfd.v.dat[0],DATOS_SIZE,0);
-    		    	  estado1=0;}
-    		      break;
-    	  case 55://esperamos ni maiz, fue un delay
-    	      		menu.b.b.isBusy=0;//Deteccion.BarraDeteccionStatus=BUSY_WAIT;//terminamos de graficar algo.      
-    	      	    cleanArray(&vfd.v.dat[0],DATOS_SIZE,0);
-    	      		estado1=0;
-    	      		break;
-    	      		            
-    	  default:estado1=0;break;}//fin estado principal-----------------------------------------      
-return 0; //controlador de VIDEO
-}// Controlador_Driver_de_Display_Graficos_VFD_Operativo---------------------------------------(void){
+/*Driver principal de transmision al display 
+ * por serial* */
+void Transmision_al_Display_TFT(void){
+static unsigned char estado;
+static uint8_t dato,cmd,len;
+//const unsigned char FIN1=0xF9U;
+unsigned char *x;
+	x=&dato;
+    switch(estado){
+    	case 1:if(vfd.TxDisp.ncount>0){estado++;}break;
+    	case 2:if(vfd.fifo.pop(x)){
+    		      if(*x==STX){estado++;}else{estado=FIN;}}
+    		   else{estado=FIN;}break;
+    	case 3:if(vfd.fifo.pop(x)){
+    			  cmd=*x;
+    			  if(buscarComando(cmd)){estado++;}
+    			  else{estado=FIN;}}
+    			break;
+    	case 4:if(VFDserial_SendChar(STX)==0){estado++;}break;
+    	case 5:if(VFDserial_SendChar(cmd)==0){estado++;}break;
+    	case 6:if(vfd.fifo.pop(x)){
+    		       len=*x;
+    		       if(len>0){estado++;}}break;
+    	case 7:if(VFDserial_SendChar(len)==0){estado++;}break;
+    	case 8:if(len==0){estado=11;}else{estado++;}break;
+    	case 9:if(vfd.fifo.pop(x)){dato=*x;estado++;len--;}break;
+    	case 10:if(VFDserial_SendChar(dato)==0){estado=8;}break;
+    	case 11:if(VFDserial_SendChar(ETX)==0){estado=FIN;}break;
+    	case FIN:
+    	default:len=0;cmd=0;dato=0;estado=1;break;}//fin de estado
+}//fin de transmision del display tft
 
-					
+//buscar comando de transmision disponible
+//regresa TRUE si encuntra comando
+uint8_t buscarComando(uint8_t cmd){
+uint8_t ret;	
+	switch(cmd){
+		case CMD_DDS:
+			         ret=TRUE;break;
+		default:ret=0;}
+return ret;
+}//fin buscar comando+++++++++++++++++++++++++++
+
+
 /* obtener una instancia libre  para manipular hilos
  * de metodos al mismo tiempo del mismo metodo
  * */
@@ -958,7 +812,7 @@ auto unsigned char control;
 //p: pointers, n: numero de pointers
 //void xControlador_Principal_de_Comunicaciones_Perifericas(void){ 
 //	
-//     xComunicacion_serial_al_IOUP_tarjeta();
+//     Transmision_Consola();
 //    // comunicacion_IIC_con_Memoria_EEPROM();
 //    // comunicacion_IIC_con_NVRAM();
 //    // comunicacion_serial_al_VFD_display_Transmission();

@@ -135,7 +135,7 @@ return ret;
 
 /* Exclusivo para usarse en el envio de datos al VFD
  *  solo por un proceso:
- *  xDriver_de_Transmision_al_VFD*/
+ * 138: *  xDriver_de_Transmision_al_VFD*/ 
 unsigned char delay_us_VFD_exclusivo(unsigned short int t){
 auto unsigned char ret=0;
 //auto unsigned short int usint; 

@@ -80,6 +80,7 @@ unsigned char  buffer17[SIZE_BUFFER15];//buffer de yL, ylower byte, deteccion a 
 unsigned char  buffer18[SIZE_BUFFER15];//buffer de yH, yHi byte, deteccion a IOUP
 unsigned char  buffer19[SIZE_BUFFER16];//FIFO de gestion del recurso VFD
 unsigned char  buffer20[SIZE_BUFFER16];//FIFO de gestion del recurso IO
+unsigned char  buffer21[SIZE_BUFFER21];//fifo de display tft
 unsigned char keypadIn[SIZE_KEYPAD_IN];
 unsigned char FIFO_SER_KEYPAD[SIZE_SER_KEYPAD];
 unsigned char FIFO_DDS_DISPLAY_PIXEL_X[SIZE_FIFO_DDS_pixel];
@@ -147,6 +148,8 @@ void init_queues(void){
      	  init_FIFO_General_1byte(&com.gotis.dds.fifos.yh,&buffer18[0],&buffer18[SIZE_BUFFER15-1],SIZE_BUFFER15);  
      	  init_FIFO_General_1byte(&recurso.VFD,&buffer19[0],&buffer19[SIZE_BUFFER16-1],SIZE_BUFFER16);
      	  init_FIFO_General_1byte(&recurso.IO,&buffer20[0],&buffer20[SIZE_BUFFER16-1],SIZE_BUFFER16);
+     	  init_FIFO_General_1byte(&vfd.TxDisp,&buffer21[0],&buffer21[SIZE_BUFFER21-1],SIZE_BUFFER21);
+
      	  vfd.f1.append= vfd_FIFO_push;
      	  vfd.f1.pop=vfd_FIFO_pop;                                                                                                                                                                                                                                                                                                                                                                                                                      
      	  vfd.f1.resetFIFOS=vfd_FIFOs_RESET;
