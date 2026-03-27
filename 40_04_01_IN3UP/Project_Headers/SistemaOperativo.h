@@ -199,5 +199,5 @@ void return_instancia(unsigned char instancia);
 //void reset_Instancia(unsigned char instancia); union
 unsigned char xDriver_de_Transmision_al_VFD(void);
 void Pruebas_Y_Debugeo_Testeo_del_Systema(void);
-void Transmision_al_Display_TFT(void);
+void vTask1_Transmision_al_CPU_TFT(void);
 unsigned char buscarComando(unsigned char cmd);

@@ -23,13 +23,26 @@
 
 
 
+#define MAX_COLA 10
 
+
+// Estructura para la cola circular
+typedef struct {
+    unsigned char ids[MAX_COLA];
+    unsigned char frente;
+    unsigned char final;
+    unsigned char cantidad;
+} ColaCircular;
 
 typedef union{//access word: 
 	unsigned  short int wordx;   //   	0xaabb   
 	unsigned char byteH;      //         aa
 	unsigned char byte[2];        //byte[0]=aa,byte[1]=bb
 }uword3;
+
+
+// Variable global para la cola de espera
+static ColaCircular colaEspera;
 
 extern struct _Menu_ menu;
 const unsigned char SIZE_FIFO_DDS_pixel=35;//tamaño del FIFO DDS pixels a ser pintados en DDS menu
@@ -148,13 +161,15 @@ void init_queues(void){
      	  init_FIFO_General_1byte(&com.gotis.dds.fifos.yh,&buffer18[0],&buffer18[SIZE_BUFFER15-1],SIZE_BUFFER15);  
      	  init_FIFO_General_1byte(&recurso.VFD,&buffer19[0],&buffer19[SIZE_BUFFER16-1],SIZE_BUFFER16);
      	  init_FIFO_General_1byte(&recurso.IO,&buffer20[0],&buffer20[SIZE_BUFFER16-1],SIZE_BUFFER16);
-     	  init_FIFO_General_1byte(&vfd.TxDisp,&buffer21[0],&buffer21[SIZE_BUFFER21-1],SIZE_BUFFER21);
-
-     	  vfd.f1.append= vfd_FIFO_push;
-     	  vfd.f1.pop=vfd_FIFO_pop;                                                                                                                                                                                                                                                                                                                                                                                                                      
-     	  vfd.f1.resetFIFOS=vfd_FIFOs_RESET;
+     	  init_FIFO_General_1byte_v2(&vfd.TxDisp,&buffer21[0],&buffer21[SIZE_BUFFER21-1],SIZE_BUFFER21);     	  
+     	 inicializarSistemaRecursos();//va con init_FIFO_General_1byte_v2
      	  dds.pix.f.append=dds_pix_append;
+     	  vfd.f1.append= vfd_FIFO_push;
+     	  
+     	  vfd.f1.pop=vfd_FIFO_pop;  
      	  dds.pix.f.pop=dds_pix_pop;
+
+     	  vfd.f1.resetFIFOS=vfd_FIFOs_RESET;
      	  dds.pix.f.resetFIFOS=dds_pix_reset;
           reset_Memo_Pix_DDS(); 		
           vfd.bits.b.finit_VFD=FALSE;//no esta inizilizado el VFD, se inizializa en el driver de video
@@ -178,6 +193,107 @@ void init_queues(void){
           //recurso.f.append=vfd_FIFO_Recursos_push;
           //init_FIFO_IIC();//se encuentra en-->> init_I2C
 }//fin de initizalizr las FIFOS------------------------------
+
+
+
+// Versión v2: funciones para _FIFO_1byte_v2_ (appendByte con un solo parámetro)
+void init_FIFO_General_1byte_v2(struct _FIFO_1byte_v2_ *s, unsigned char *h, unsigned char *t, unsigned short int size){
+    s->head = h;
+    s->tail = t;
+    s->pop = s->tail;
+    s->push = s->tail;
+    s->ncount = 0;
+    s->popf = FIFO_general_1byte_pop_v2;
+    s->appendByte = FIFO_push_1byte_v2;
+    s->size = size;
+    s->resetFIFO = reset_FIFO_general_UChar_v2;
+    s->recurso=0;//recurso libre
+}
+
+void reset_FIFO_general_UChar_v2(struct _FIFO_1byte_v2_ *s, unsigned char *arr, unsigned short int size){
+    s->pop = s->push = s->tail;
+    s->ncount = 0;
+    cleanArray(arr, size, 0);
+}
+
+unsigned char FIFO_general_1byte_pop_v2(unsigned char *dato, struct _FIFO_1byte_v2_ *s){
+    if(s->ncount == 0)
+        return FALSE;
+    if(s->ncount == 1){
+        *dato = *(s->pop);
+        *(s->pop) = 0;
+        s->pop = s->push = s->tail;
+        s->ncount = 0;
+    }
+    else{
+        *dato = *(s->pop);
+        *(s->pop) = 0;
+        if(s->ncount > 0)
+            s->ncount--;
+        if(s->pop == s->head)
+            s->pop = s->tail;
+        else
+            s->pop--;
+    }
+    return TRUE;
+}
+
+unsigned char FIFO_general_1byte_push_v2(unsigned char dato, struct _FIFO_1byte_v2_ *s){
+    if(!(s->size > s->ncount)) 
+        return FALSE;
+    if(s->ncount == 0){
+        s->pop = s->push = s->tail;
+        *(s->push) = dato;
+        s->push--;
+        s->ncount++;
+        return TRUE;
+    }
+    else{
+        if(s->push == s->head){
+            if(s->tail == s->pop){
+                *(s->push) = dato;
+                s->push = s->pop;
+                s->ncount++;
+                if(s->ncount == s->size){
+                    return TRUE;
+                }
+                else{
+                    __asm(nop); __asm(Halt);
+                }
+            }
+            else{
+                *(s->push) = dato;
+                s->push = s->tail;
+                s->ncount++;
+                return TRUE;
+            }
+        }
+        else{
+            if(s->push - 1 == s->pop){
+                *(s->push) = dato;
+                s->push = s->pop;
+                s->ncount++;
+                if(s->ncount == s->size){
+                    return TRUE;
+                }
+                else{
+                    __asm(nop); __asm(Halt);
+                }
+            }
+            else{
+                *(s->push) = dato;
+                s->push--;
+                s->ncount++;
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
+}
+
+unsigned char FIFO_push_1byte_v2(unsigned char x){
+    return FIFO_general_1byte_push_v2(x, &vfd.TxDisp);
+}
 
 
 void reset_sys_mon(void){
@@ -1625,6 +1741,7 @@ unsigned char dds_pix_append(signed short int x,signed short int y){
 	dds.pix.yH.appendByte(dds.pix.u.b.H,&dds.pix.yH);
 }//fin dds_pix_append------------------------------------------------
 
+
 unsigned char dds_pix_pop(signed short int *x,signed short int *y){
 unsigned char H,L;   	
 	dds.pix.xL.popf(&L,&dds.pix.xL);
@@ -1872,4 +1989,110 @@ void Devolver_Recurso_VFD(unsigned char recurso1,unsigned char pid){
 	 default:__asm(nop);__asm(Halt);break;}
 }//fin de devolver recurso vfd----------------------------------------
 
+
+
+
+//------------------------------------------------------------------------
+
+
+
+// Función auxiliar para verificar si la cola está llena
+static unsigned char colaLlena(void) {
+	if (colaEspera.cantidad == MAX_COLA)
+	        return TRUE;
+	    return FALSE;
+}//--------------------------------------------------------------
+
+// Función auxiliar para verificar si la cola está vacía
+static unsigned char colaVacia(void) {
+	if (colaEspera.cantidad == 0)
+	        return TRUE;
+	    return FALSE;
+}//--------------------------------------------------------------
+
+// Función para verificar si un ID ya está en la cola
+static unsigned char idEnCola(unsigned char id) {
+unsigned char i;
+unsigned char cont = 0;    
+    if (colaVacia()) {
+        return FALSE;} 
+    i = colaEspera.frente;
+    while(cont < colaEspera.cantidad) {
+        if (colaEspera.ids[i] == id) {
+            return TRUE;}  // ID ya está en la cola
+        i = (i + 1) % MAX_COLA;
+        cont++;}
+    return FALSE;
+}//-----------------------------------------------------------
+
+// Función para encolar un ID (solo si no está ya en la cola)
+static unsigned char encolar(unsigned char id) {
+    if (idEnCola(id)) {    // Verificar si el ID ya está en la cola
+        return FALSE;}  // ID ya está en espera, no se encola de nuevo
+    if (colaLlena()) {
+        return FALSE;}  // Cola llena, no se puede encolar
+    colaEspera.ids[colaEspera.final] = id;
+    colaEspera.final = (colaEspera.final + 1) % MAX_COLA;
+    colaEspera.cantidad++;
+    return TRUE;
+}//--------------------------------------------------------------
+
+// Función para desencolar un ID
+static unsigned char desencolar(unsigned char *id) {
+    if (colaVacia()) {
+        return FALSE; } // Cola vacía
+    *id = colaEspera.ids[colaEspera.frente];
+    colaEspera.frente = (colaEspera.frente + 1) % MAX_COLA;
+    colaEspera.cantidad--;
+    return TRUE;
+}//----------------------------------------------------------------
+
+// Función para solicitar recurso
+unsigned char solicitarRecurso(unsigned char *recurso,unsigned char id) {
+    // Si el recurso está disponible
+    if (*recurso == 0) { // Recurso disponible, asignarlo al ID solicitante
+        *recurso = id;
+        return TRUE;}  // Recurso asignado exitosamente
+    if (*recurso == id) {// Recurso ocupado// Verificar si el ID ya tiene el recurso
+        return TRUE;}  // El ID ya tiene el recurso, no hacer nada
+    if (idEnCola(id)) {// Verificar si el ID ya está en la cola de espera
+        return FALSE; } // El ID ya está esperando, no se encola de nuevo
+    if (!encolar(id)) {  // Encolar el ID que solicita el recurso
+        return FALSE;}  // Error: cola de espera llena 
+return FALSE;  // Recurso no disponible, ID encolado
+}//----------------------------------------------------------------
+
+// Función para liberar recurso
+unsigned char liberarRecurso(unsigned char *recurso, unsigned char id) {
+unsigned char siguienteId;
+
+    if(*recurso!=id){// Verificar que el ID que libera sea el que tiene el recurso
+        return FALSE;}  // No se puede liberar un recurso que no posee
+    *recurso = 0;  // Liberar el recurso
+    if(!colaVacia()){// Verificar si hay IDs en espera
+        if (desencolar(&siguienteId)) {// Desencolar el siguiente ID y asignarle el recurso
+            *recurso = siguienteId;
+            return TRUE;}}  // Recurso transferido al siguiente en la cola
+return TRUE;  // Recurso liberado, sin esperas
+}//----------------------------------------------------------------
+
+
+// Función para limpiar la cola (útil para reiniciar el sistema)
+void limpiarColaEspera(void) {
+    colaEspera.frente = 0;
+    colaEspera.final = 0;
+    colaEspera.cantidad = 0;
+}//------------------------------------------------
+
+// Inicialización explícita (llamar al inicio del programa)
+void inicializarSistemaRecursos(void) {
+    unsigned char i;
+    //recursoActual = 0;
+    colaEspera.frente = 0;
+    colaEspera.final = 0;
+    colaEspera.cantidad = 0;
+    for (i = 0; i < MAX_COLA; i++) {
+        colaEspera.ids[i] = 0;
+    }
+}//---------------------------------------------------------------------
 

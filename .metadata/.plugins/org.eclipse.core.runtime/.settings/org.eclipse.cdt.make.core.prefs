@@ -1,0 +1,4 @@
+eclipse.preferences.version=1
+org.eclipse.cdt.make.core.parallelJobsNumber=8
+org.eclipse.cdt.make.core.scanner.discovery.console.enabled=false
+org.eclipse.cdt.make.core.stopOnError=true

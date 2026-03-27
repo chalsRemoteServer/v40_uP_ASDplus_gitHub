@@ -27,6 +27,7 @@
 #include "TI1.h"
 #include "errorController.h"
 #include "DSP.h"
+#include "queue.h"
 
 
 
@@ -63,6 +64,7 @@ extern unsigned char ErrorStatusLeds;
 extern struct _Error323_ e;//error controller data struct
 extern struct _Detection Deteccion;
 extern struct _Signal_ Signal;
+extern struct _DISPLAY_VFD_ vfd;
 
 
 struct _ADC_ adc;
@@ -157,7 +159,8 @@ register unsigned char i;
 conversion is completed and the data is latched into the on-chip shift register*/
 //falling edge leemos el dato anterior guardado en el registro
 //interrupcion externa pin-41  IRQ11, INTERRUPCIon directa de hardare la ejecuta una IRQ oN
-//Interrupts when rising edge is trigger from busy adc's, despuede la conversion y guardado en los registros del valor de la conversion
+//Interrupts when rising edge is trigger from busy adc's, despuede la conversion y guardado
+//en los registros del valor de la conversion
 void Busy_Interrupt_IRQ(void){//Interrumption on down edge, EXTERNAL PIN INTERRUPT SIGNAL.
 volatile unsigned char i;
 	   Select_SPI_device(ADC__CH1);
@@ -188,6 +191,40 @@ static unsigned char i;
          *xx7=Deteccion.RawY;
          return TRUE;}
     else return FALSE;
+}//fin prueba---------------------------------------------------
+
+/* los datos crudos del ADC se meten ala fifo TX SERIAL
+ * ya con el protocolo 
+ * STX,CMD,LEN,dato1H,dato1L,dato2H,datos2L,ETX
+ * */
+void vTask2_ADC_to_FIFO_tx_CPU_TFT(void){
+static unsigned char estado;
+static unsigned short int x0,y0,x,y;
+unsigned char cmd=CMD_DDS;
+unsigned char len=4;
+    switch(estado){
+    	case 1:x=(unsigned short int)Deteccion.RawX;
+    		   y=(unsigned short int)Deteccion.RawY;break;
+    	case 2:if(x!=x0)estado=4;else{estado++;}break;
+    	case 3:if(y!=y0)estado=4;else{estado=1;}break;
+    	case 4:x0=x;y0=y;estado++;break;
+    	case 5:if(solicitarRecurso(&vfd.TxDisp.recurso,ID_vTask_2))estado++;
+    	case 6:vfd.TxDisp.appendByte(0x02);estado++;break;
+    	case 7:vfd.TxDisp.appendByte(cmd);estado++;break;
+    	case 8:vfd.TxDisp.appendByte(len);estado++;break;
+    	case 9:vfd.TxDisp.appendByte((unsigned char)(x >> 8));// Enviar BYTE_XH (byte alto de X)
+               estado++; break;
+    	case 10:vfd.TxDisp.appendByte((unsigned char)(x & 0xFF));// Enviar BYTE_XL (byte bajo de X)
+				estado++;break;
+		case 11:vfd.TxDisp.appendByte((unsigned char)(y >> 8));// Enviar BYTE_YH (byte alto de Y)
+				estado++;break;
+		case 12:vfd.TxDisp.appendByte((unsigned char)(y & 0xFF));// Enviar BYTE_YL (byte bajo de Y)
+				estado++;break;
+		case 13:vfd.TxDisp.appendByte(ETX);  // ETX // Enviar ETX (End of Text)
+				liberarRecurso(&vfd.TxDisp.recurso,ID_vTask_2);
+		 	 	estado++;break;
+		default:estado=1;break;
+    }//fin switch------------
 }//fin prueba---------------------------------------------------
 
 

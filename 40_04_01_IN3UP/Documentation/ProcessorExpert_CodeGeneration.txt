@@ -6592,3 +6592,35 @@ Target Processor: MCF52233_80_LQFP; CPUDB ver 3.00.000
 # Documentation
  - Documentation\40_03_01_IN3UP_SIGNALS.txt - regenerated
 Totally 2 file(s) changed during code generation.
+###############################################################
+Code generation 2026/03/19, 09:30; CodeGen: 1 by user: desarrollo_1
+by Processor Expert 10.3  for Freescale Microcontrollers; PE core 05.09
+Configuration: INTERNAL_FLASH
+Target Processor: MCF52233_80_LQFP; CPUDB ver 3.00.000
+# There is no information about previous code generation available, starting from now.
+###############################################################
+Code generation 2026/03/19, 10:00; CodeGen: 2 by user: desarrollo_1
+by Processor Expert 10.3  for Freescale Microcontrollers; PE core 05.09
+Configuration: INTERNAL_FLASH
+Target Processor: MCF52233_80_LQFP; CPUDB ver 3.00.000
+# Component Cpu:MCF52233_80_LQFP, the following files modified due to internal interdependency:
+ - Generated_Code\Vectors.c - changed
+ - Generated_Code\Cpu.c - changed
+# Settings of the component Busy:ExtInt have been changed:
+ > property Interrupt priority : value changed from medium priority to level 7, priority within level 6
+ - Generated_Code\Busy.h - changed
+ - Generated_Code\Busy.c - changed
+# Documentation
+ - Documentation\40_04_01_IN3UP_SIGNALS.txt - regenerated
+ - Documentation\40_04_01_IN3UP_Settings.xml - regenerated
+Totally 6 file(s) changed during code generation.
+###############################################################
+Code generation 2026/03/19, 10:17; CodeGen: 3 by user: desarrollo_1
+by Processor Expert 10.3  for Freescale Microcontrollers; PE core 05.09
+Configuration: INTERNAL_FLASH
+Target Processor: MCF52233_80_LQFP; CPUDB ver 3.00.000
+# Component Cpu:MCF52233_80_LQFP, the following files modified due to internal interdependency:
+ - Generated_Code\Vectors.c - changed
+# Documentation
+ - Documentation\40_04_01_IN3UP_SIGNALS.txt - regenerated
+Totally 2 file(s) changed during code generation.

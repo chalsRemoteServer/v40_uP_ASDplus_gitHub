@@ -1,0 +1,36 @@
+
+**** Build of configuration FLASH for project 40_04_01_IN3UP ****
+
+"C:\\Freescale\\CW MCU v10.7\\gnu\\bin\\mingw32-make" all 
+'Building file: ../Sources/SistemaOperativo.c'
+'Executing target #11 ../Sources/SistemaOperativo.c'
+'Invoking: ColdFire Compiler'
+"C:/Freescale/CW MCU v10.7/MCU/ColdFire_Tools/Command_Line_Tools/mwccmcf" @@"Sources/SistemaOperativo.args" -o "Sources/SistemaOperativo_c.obj" "../Sources/SistemaOperativo.c" -MD -gccdep
+C:/Freescale/CW MCU v10.7/MCU/ColdFire_Tools/Command_Line_Tools/mwccmcf|Compiler|Note
+(D:\00_Desarrollo1_MIS_DOCs\Documents\02_DESARROLLO\04_FIRMWARE\03_GSI_ASD+_f\03_uP_f\v41.1_IN3UP\40_04_01_IN3UP\Project_Headers\VFDmenu.h|30|2|1|435|1)
+=  #pragma message("version de Hardware 2.3 pines que cambian") 
+>version de Hardware 2.3 pines que cambian
+C:/Freescale/CW MCU v10.7/MCU/ColdFire_Tools/Command_Line_Tools/mwccmcf|Compiler|Note
+(D:\00_Desarrollo1_MIS_DOCs\Documents\02_DESARROLLO\04_FIRMWARE\03_GSI_ASD+_f\03_uP_f\v41.1_IN3UP\40_04_01_IN3UP\Project_Headers\VFDmenu.h|31|2|1|498|1)
+=  #pragma message("Led3_Process  Pin28[QSPI_CS0]") 
+>Led3_Process  Pin28[QSPI_CS0]
+C:/Freescale/CW MCU v10.7/MCU/ColdFire_Tools/Command_Line_Tools/mwccmcf|Compiler|Note
+(D:\00_Desarrollo1_MIS_DOCs\Documents\02_DESARROLLO\04_FIRMWARE\03_GSI_ASD+_f\03_uP_f\v41.1_IN3UP\40_04_01_IN3UP\Project_Headers\VFDmenu.h|32|2|1|549|1)
+=  #pragma message(" N/A          Pin77[GPT1]") 
+> N/A          Pin77[GPT1]
+C:/Freescale/CW MCU v10.7/MCU/ColdFire_Tools/Command_Line_Tools/mwccmcf|Compiler|Note
+(D:\00_Desarrollo1_MIS_DOCs\Documents\02_DESARROLLO\04_FIRMWARE\03_GSI_ASD+_f\03_uP_f\v41.1_IN3UP\40_04_01_IN3UP\Project_Headers\VFDmenu.h|33|2|1|596|1)
+=  #pragma message("QSPI-CS0      Pin57[SPDLED]") 
+>QSPI-CS0      Pin57[SPDLED]
+C:/Freescale/CW MCU v10.7/MCU/ColdFire_Tools/Command_Line_Tools/mwccmcf|Compiler|Warning
+(D:\00_Desarrollo1_MIS_DOCs\Documents\02_DESARROLLO\04_FIRMWARE\03_GSI_ASD+_f\03_uP_f\v41.1_IN3UP\40_04_01_IN3UP\Sources\SistemaOperativo.c|835|15|3|33226|3)
+=struct Coordsf P58; 
+>variable / argument 'P58' is not used in function
+'Finished building: ../Sources/SistemaOperativo.c'
+' '
+'Building target: 37_8_IN1UP.elf'
+'Executing target #70 37_8_IN1UP.elf'
+'Invoking: ColdFire Linker'
+"C:/Freescale/CW MCU v10.7/MCU/ColdFire_Tools/Command_Line_Tools/mwldmcf" -o "37_8_IN1UP.elf" @@"37_8_IN1UP.args"   
+'Finished building target: 37_8_IN1UP.elf'
+' '

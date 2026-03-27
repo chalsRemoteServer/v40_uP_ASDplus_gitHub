@@ -313,4 +313,5 @@
 
 #define CMD_DDS 0xF1 //comando de transmision datos de deteccion raw X&Y
 
+#define ID_vTask_2  0x0A
 

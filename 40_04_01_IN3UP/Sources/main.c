@@ -293,12 +293,14 @@ extern unsigned long int delaydebug;
             // comunicacion_IIC_con_Memoria_EEPROM();
 	        // comunicacion_IIC_con_NVRAM();
 			//Transmision_al_Display_TFT1();//3-pointers
-			Transmision_al_Display_TFT();
+			vTask1_Transmision_al_CPU_TFT();
             xControl_Principal_de_Menus_Operativo();//Control_Operativo_de_Escape_de_Menus();//Cambio de Menu    
             Signal_Processor_Controller();//Procesador Central de las Señales analogas digitalizadas		
             Monitor_Maestro_de_ERRORES();//Monitor Maestro del SYSTEMA 
             Controlador_Driver_de_Keypad_Operativo();  
             Pruebas_Y_Debugeo_Testeo_del_Systema(); 
+            vTask2_ADC_to_FIFO_tx_CPU_TFT();
+            
 
 
 

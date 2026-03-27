@@ -722,9 +722,10 @@ static unsigned char i;
 }//DDS_repaint_Zoom----------------------------------------------------
 
 
+
 /*Driver principal de transmision al display 
  * por serial* */
-void Transmision_al_Display_TFT(void){
+void vTask1_Transmision_al_CPU_TFT(void){
 static unsigned char estado;
 static uint8_t dato,cmd,len;
 //const unsigned char FIN1=0xF9U;

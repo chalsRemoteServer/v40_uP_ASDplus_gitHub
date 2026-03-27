@@ -606,6 +606,7 @@ unsigned char get_Fit_Zoom(struct Coordf P);
 unsigned char xDisplay_Punto_DDS_VFD(struct Coorduc *Puc,struct Coordusi *Pu,unsigned char *inst,double *d);
 unsigned char xDisplay_Sens_DDS_VFD(unsigned char *inst,unsigned short int *usi,float *f);
 unsigned char evaluar_ssint_v2(signed short int dato,signed short int max);
+void vTask2_ADC_to_FIFO_tx_CPU_TFT(void);
 
 
 

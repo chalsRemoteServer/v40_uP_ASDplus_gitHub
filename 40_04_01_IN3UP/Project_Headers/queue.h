@@ -254,6 +254,21 @@ struct _FIFO_1byte_{//FIFO PARA UNA VARIABLE para un byte
     unsigned short int size; //size de la fifo
 };
 
+// Nueva estructura para appendByte con un solo parámetro
+struct _FIFO_1byte_v2_{
+    unsigned char *pop;
+    unsigned char *head;
+    unsigned char *tail;
+    unsigned char *push;
+	unsigned char (*popf)(unsigned char *n,struct _FIFO_1byte_v2_ *s);
+	unsigned char (*appendByte)(unsigned char n);  // SOLO UN PARÁMETRO
+    void (*vaciarbuff)(unsigned char *p1,unsigned char *p2,unsigned short int size);
+    void (*resetFIFO)(struct _FIFO_1byte_v2_ *s,unsigned char *arr,unsigned short int size);
+    unsigned short int ncount;
+    unsigned short int size;
+    unsigned char recurso;//recurso ocupado  o libre
+};
+
 
 /* version 110422-1119 */
 struct  _SERIAL_{
@@ -347,7 +362,7 @@ struct COMUNICACIONES_{//-----------------------------------------------
 
 
 struct _DISPLAY_VFD_{	
-	struct _FIFO_1byte_ TxDisp;//fifo serial a display
+	struct _FIFO_1byte_v2_  TxDisp;//fifo serial a display
 	struct _FIFO_1byte_ x;//parametro 1
 	struct _FIFO_1byte_ y;//parametro 2
 	struct _FIFO_1byte_ p;//parametro 3
@@ -697,3 +712,17 @@ unsigned char sacar_de_la_FIFO_IO(unsigned char pid);
 unsigned char insertarlo_en_Fifo_IO(unsigned char pid);
 unsigned char ya_esta_en_la_FIFO_IO(unsigned char pid);
 void Devolver_Recurso_VFD(unsigned char recurso,unsigned char pid);
+// Nuevas funciones para _FIFO_1byte_v2_
+void init_FIFO_General_1byte_v2(struct _FIFO_1byte_v2_ *s, unsigned char *h, unsigned char *t, unsigned short int size);
+unsigned char FIFO_general_1byte_push_v2(unsigned char dato, struct _FIFO_1byte_v2_ *s);
+unsigned char FIFO_general_1byte_pop_v2(unsigned char *dato, struct _FIFO_1byte_v2_ *s);
+void reset_FIFO_general_UChar_v2(struct _FIFO_1byte_v2_ *s, unsigned char *arr, unsigned short int size);
+unsigned char FIFO_push_1byte_v2(unsigned char x);
+unsigned char colaVacia(void);
+unsigned char idEnCola(unsigned char id);
+unsigned char encolar(unsigned char id);
+unsigned char desencolar(unsigned char *id);
+unsigned char solicitarRecurso(unsigned char *recurso,unsigned char id); 
+unsigned char liberarRecurso(unsigned char *recurso, unsigned char id);
+void limpiarColaEspera(void);
+void inicializarSistemaRecursos(void);
